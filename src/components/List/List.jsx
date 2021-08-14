@@ -3,12 +3,10 @@ import { CircularProgress, Grid, Typography, InputLabel, MenuItem, FormControl, 
 import useStyles from './styles';
 import ListItem from './ListItem';
 
-const List = () => {
+const List = ({ places }) => {
   const classes = useStyles();
   const [type, setType] = useState('hotels');
   const [rating, setRating] = useState(0);
-
-  const places = [{name: 'List Item 1'},{name: 'List Item 2'},{name: 'List Item 3'}];
 
   return (
     <div className={classes.container}>
