@@ -10,6 +10,10 @@ import List from "./components/List/List";
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [places, setPlaces] = useState([]);
+  const [filteredPlaces, setFilteredPlaces] = useState([]);
+
+  const [type, setType] = useState("restaurants");
+  const [rating, setRating] = useState(0);
 
   const [coords, setCoords] = useState({ lat: 0, lng: 0 });
   const [bounds, setBounds] = useState(null);
@@ -25,15 +29,23 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const afterFilterPlaces = places.filter(
+      (place) => Number(place.rating) > rating
+    );
+    setFilteredPlaces(afterFilterPlaces);
+    console.log(rating);
+  }, [rating]);
+
+  useEffect(() => {
     if (bounds) {
       setIsLoading(true);
-      getPlacesData(bounds.sw, bounds.ne).then((data) => {
-        setPlaces(data.filter((place) => place.name && place.num_reviews > 0));
+      getPlacesData(type, bounds.sw, bounds.ne).then((data) => {
+        setPlaces(data?.filter((place) => place.name && place.num_reviews > 0));
         setIsLoading(false);
         console.log(places);
       });
     }
-  }, [bounds]);
+  }, [type, bounds]);
 
   return (
     <>
@@ -46,11 +58,19 @@ function App() {
             setCoords={setCoords}
             setBounds={setBounds}
             setChild={setChild}
-            places={places}
+            places={filteredPlaces.length ? filteredPlaces : places}
           />
         </Grid>
         <Grid item xs={12} md={4}>
-          <List isLoading={isLoading} places={places} child={child} />
+          <List
+            isLoading={isLoading}
+            places={filteredPlaces.length ? filteredPlaces : places}
+            type={type}
+            rating={rating}
+            child={child}
+            setType={setType}
+            setRating={setRating}
+          />
         </Grid>
       </Grid>
     </>
