@@ -12,7 +12,11 @@ import {
 import { Rating } from "@material-ui/lab";
 import { LocationOn } from "@material-ui/icons";
 
-const ListItem = ({ place }) => {
+const ListItem = ({ place, selected, refProp }) => {
+  if (selected) {
+    refProp?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
     <Card elevation={6}>
       {place.photo ? (

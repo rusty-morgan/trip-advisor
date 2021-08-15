@@ -8,6 +8,7 @@ import Map from "./components/Map/Map";
 import List from "./components/List/List";
 
 function App() {
+  const [isLoading, setIsLoading] = useState(false);
   const [places, setPlaces] = useState([]);
 
   const [coords, setCoords] = useState({ lat: 0, lng: 0 });
@@ -25,10 +26,11 @@ function App() {
 
   useEffect(() => {
     if (bounds) {
+      setIsLoading(true);
       getPlacesData(bounds.sw, bounds.ne).then((data) => {
-        console.log(data);
-
-        setPlaces(data);
+        setPlaces(data.filter((place) => place.name && place.num_reviews > 0));
+        setIsLoading(false);
+        console.log(places);
       });
     }
   }, [bounds]);
@@ -48,7 +50,7 @@ function App() {
           />
         </Grid>
         <Grid item xs={12} md={4}>
-          <List places={places} child={child} />
+          <List isLoading={isLoading} places={places} child={child} />
         </Grid>
       </Grid>
     </>
