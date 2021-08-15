@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { CssBaseline, Grid } from "@material-ui/core";
+import {
+  CssBaseline,
+  Grid,
+  ThemeProvider,
+  createTheme,
+} from "@material-ui/core";
 
 import { getPlacesData } from "./api";
 
@@ -20,6 +25,10 @@ function App() {
 
   const [child, setChild] = useState(null);
 
+  const [themeState, setThemeState] = useState(
+    localStorage.getItem("darkMode") || false
+  );
+
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
@@ -29,12 +38,11 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const afterFilterPlaces = places.filter(
+    const afterFilterPlaces = places?.filter(
       (place) => Number(place.rating) > rating
     );
     setFilteredPlaces(afterFilterPlaces);
-    console.log(rating);
-  }, [rating]);
+  }, [rating, places]);
 
   useEffect(() => {
     if (bounds) {
@@ -42,29 +50,41 @@ function App() {
       getPlacesData(type, bounds.sw, bounds.ne).then((data) => {
         setPlaces(data?.filter((place) => place.name && place.num_reviews > 0));
         setIsLoading(false);
-        console.log(places);
       });
     }
   }, [type, bounds]);
 
+  const darkTheme = createTheme({
+    palette: {
+      type: "dark",
+    },
+  });
+
+  const lightTheme = createTheme({});
+
   return (
-    <>
+    <ThemeProvider theme={themeState ? darkTheme : lightTheme}>
       <CssBaseline />
-      <Header />
-      <Grid container spacing={3} style={{ width: "100%", paddingTop: "64px" }}>
+      <Header
+        setCoords={setCoords}
+        themeState={themeState}
+        setThemeState={setThemeState}
+      />
+      <Grid container spacing={3} style={{ width: "100%" }}>
         <Grid item xs={12} md={8}>
           <Map
             coords={coords}
             setCoords={setCoords}
             setBounds={setBounds}
             setChild={setChild}
-            places={filteredPlaces.length ? filteredPlaces : places}
+            themeState={themeState}
+            places={filteredPlaces?.length ? filteredPlaces : places}
           />
         </Grid>
         <Grid item xs={12} md={4}>
           <List
             isLoading={isLoading}
-            places={filteredPlaces.length ? filteredPlaces : places}
+            places={filteredPlaces?.length ? filteredPlaces : places}
             type={type}
             rating={rating}
             child={child}
@@ -73,7 +93,7 @@ function App() {
           />
         </Grid>
       </Grid>
-    </>
+    </ThemeProvider>
   );
 }
 

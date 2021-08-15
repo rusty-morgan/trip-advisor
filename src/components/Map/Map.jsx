@@ -1,22 +1,33 @@
 import React from "react";
 import GoogleMapReact from "google-map-react";
-import { Paper, Typography, useMediaQuery } from "@material-ui/core";
 
 import useStyles from "./styles";
 import { LocationOnRounded } from "@material-ui/icons";
 
-const Map = ({ coords, setCoords, setBounds, setChild, places }) => {
+import darkMapTheme from "./darkMap";
+
+const Map = ({
+  coords,
+  setCoords,
+  setBounds,
+  setChild,
+  places,
+  themeState,
+}) => {
   const classes = useStyles();
-  const isMoblie = useMediaQuery("min-width: 600px");
 
   return (
     <div className={classes.mapContainer}>
       <GoogleMapReact
-        bootstrapURLKeys={{ key: "AIzaSyCds6f50cal4ANZZKyZGrOLhYD5ZoCP2oc" }}
+        bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY }}
         center={coords}
         defaultZoom={14}
         margin={[50, 50, 50, 50]}
-        options={""}
+        options={{
+          disableDefaultUI: true,
+          zoomControl: true,
+          styles: themeState ? darkMapTheme : null,
+        }}
         onChange={(e) => {
           setCoords({ lat: e.center.lat, lng: e.center.lng });
           setBounds({ ne: e.marginBounds.ne, sw: e.marginBounds.sw });
